@@ -31,37 +31,55 @@ public class JobTest {
         //  Note: You need to (write code to) create the "jobs" table before writing your test cases!
 
         private ConnectionSource connectionSource;
-        private Dao<Job, Integer> dao;
+        private Dao<Employer, Integer> employerDao;
+        private Dao<Job, Integer> jobDao;
 
         // create a new connection to JBApp database, create "jobs" table, and create a
         // new dao to be used by test cases
         @BeforeAll
         public void setUpAll() throws SQLException {
             connectionSource = new JdbcConnectionSource(URI);
+            TableUtils.createTableIfNotExists(connectionSource, Employer.class);
+            employerDao = DaoManager.createDao(connectionSource, Employer.class);
             TableUtils.createTableIfNotExists(connectionSource, Job.class);
-            dao = DaoManager.createDao(connectionSource, Job.class);
+            jobDao = DaoManager.createDao(connectionSource, Job.class);
         }
 
         // delete all rows in the jobs table before each test case
         @BeforeEach
         public void setUpEach() throws SQLException {
-
             TableUtils.clearTable(connectionSource, Job.class);
+            TableUtils.clearTable(connectionSource, Employer.class);
         }
 
         // inserting a new record where title is null must fail, the reason being
         // there is a non-null constraint on the "title" column in "jobs" table!
         @Test
-        public void testCreateTitleNull() {
-            //create a new employer instance
+        public void testCreateTitleNull() throws SQLException {
+            //create new employer and persist to database
             Employer e = new Employer("Apple", "Tech", "Summary");
-            //create a new date instance
+            employerDao.create(e);
+            //create an associated job for the employer
             Date d = new Date();
-            //create a new job instance
             Job j = new Job(null, d, d, "www.myjob.com", "Baltimore", true, true, "must be human", 23, e);
-
             // try to insert into jobs table. This must fail!
-            Assertions.assertThrows(SQLException.class, () -> dao.create(j));
+            Assertions.assertThrows(SQLException.class, () -> jobDao.create(j));
+        }
+
+        // inserting a new record where domain is an empty string must succeed!
+        @Test
+        public void testCreateDomainEmpty() throws SQLException {
+            //create new employer and persist to database
+            Employer e = new Employer("Company1", "Category1", "Summary");
+            employerDao.create(e);
+            //create an associated job for the employer
+            Date d = new Date();
+            Job j = new Job("Position1", d, d, "", "Area1", true, true, "Requirement", 12, e);
+            // try to insert into jobs table. This must succeed!
+            jobDao.create(j);
+            List<Job> ls = jobDao.queryForEq("title", j.getTitle());
+            assertEquals(ls.size(), 1);
+            assertEquals("", ls.get(0).getDomain());
         }
     }
 
