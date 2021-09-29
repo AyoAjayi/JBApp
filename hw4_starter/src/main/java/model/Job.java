@@ -11,13 +11,17 @@ public class Job {
 
     @DatabaseTable(generatedId = true)
     private int id;
+    @DatabaseField(canBeNull = false)
     private String title;
     private Date datePosted;
     private Date deadline;
+    @DatabaseField(canBeNull = false)
     private String domain;
+    @DatabaseField(canBeNull = false)
     private String location;
     private boolean fullTime;
     private boolean salaryBased;
+    @DatabaseField(canBeNull = false)
     private String requirements;
     private int payAmount;
     private Employer employer;
