@@ -9,6 +9,7 @@ import java.util.Objects;
 @DatabaseTable(tableName = "jobs")
 public class Job {
 
+    @DatabaseTable(generatedId = true)
     private int id;
     private String title;
     private Date datePosted;
