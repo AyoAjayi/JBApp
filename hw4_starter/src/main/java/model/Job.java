@@ -13,11 +13,11 @@ public class Job {
     private int id;
     @DatabaseField(canBeNull = false)
     private String title;
-    @DatabaseField(canBeNull = false) //date real
+    @DatabaseField(canBeNull = false) 
     private Date datePosted;
-    @DatabaseField //real
+    @DatabaseField 
     private Date deadline;
-    @DatabaseField //(canBeNull = false)
+    @DatabaseField 
     private String domain;
     @DatabaseField(canBeNull = false)
     private String location;
