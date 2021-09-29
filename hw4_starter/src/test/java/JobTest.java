@@ -1,6 +1,10 @@
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class JobTest {
@@ -36,6 +40,12 @@ public class JobTest {
             //  "jobs" endpoint and assert that the received status code is OK (200)!
             //  Note: In order for this to work, you need to make sure your local sparkjava
             //  server is running, before you run the JUnit test!
+            String endpoint = BASE_URL + "/jobs";
+            Request request = new Request.Builder()
+                    .url(endpoint)
+                    .build();
+            Response response = client.newCall(request).execute();
+            assertEquals(response.code(), 200);
         }
     }
 
