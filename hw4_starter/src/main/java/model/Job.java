@@ -6,7 +6,7 @@ import java.util.Objects;
 // TODO 3: Similar to what was done in Employer class, annotate Job class using
 //  ORMLite annotations so that you can easily create the "jobs" table in Main.java
 //  using ORMLite's TableUtil class.
-
+@DatabaseTable(tableName = "jobs")
 public class Job {
 
     private int id;
