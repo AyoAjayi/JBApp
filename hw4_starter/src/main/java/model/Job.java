@@ -9,21 +9,27 @@ import java.util.Objects;
 @DatabaseTable(tableName = "jobs")
 public class Job {
 
-    @DatabaseTable(generatedId = true)
+    @DatabaseField(generatedId = true)
     private int id;
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, unique = true)
     private String title;
+    @DatabaseField
     private Date datePosted;
+    @DatabaseField
     private Date deadline;
     @DatabaseField(canBeNull = false)
     private String domain;
     @DatabaseField(canBeNull = false)
     private String location;
+    @DatabaseField
     private boolean fullTime;
+    @DatabaseField
     private boolean salaryBased;
-    @DatabaseField(canBeNull = false)
+    @DatabaseField
     private String requirements;
+    @DatabaseField
     private int payAmount;
+    @DatabaseField(canBeNull = false, unique = true)
     private Employer employer;
 
     public Job() {
