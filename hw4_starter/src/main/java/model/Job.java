@@ -11,13 +11,13 @@ public class Job {
 
     @DatabaseField(generatedId = true)
     private int id;
-    @DatabaseField(canBeNull = false, unique = true)
-    private String title;
-    @DatabaseField
-    private Date datePosted;
-    @DatabaseField
-    private Date deadline;
     @DatabaseField(canBeNull = false)
+    private String title;
+    @DatabaseField(canBeNull = false) //date real
+    private Date datePosted;
+    @DatabaseField //real
+    private Date deadline;
+    @DatabaseField //(canBeNull = false)
     private String domain;
     @DatabaseField(canBeNull = false)
     private String location;
@@ -29,7 +29,7 @@ public class Job {
     private String requirements;
     @DatabaseField
     private int payAmount;
-    @DatabaseField(canBeNull = false, unique = true)
+    @DatabaseField(foreign = true, columnDefinition = "ON UPDATE CASCADE ON DELETE CASCADE")
     private Employer employer;
 
     public Job() {
