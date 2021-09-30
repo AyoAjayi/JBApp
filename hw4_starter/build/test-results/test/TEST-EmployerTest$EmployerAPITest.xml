@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="EmployerTest$EmployerAPITest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-09-30T01:02:43" hostname="MacBook-Pro-3.local" time="0.069">
-  <properties/>
-  <testcase name="testHTTPGetEmployersEndpoint()" classname="EmployerTest$EmployerAPITest" time="0.069"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

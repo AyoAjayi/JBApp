@@ -5,6 +5,7 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import model.Employer;
+import model.Job;
 import spark.Spark;
 
 import java.sql.SQLException;
