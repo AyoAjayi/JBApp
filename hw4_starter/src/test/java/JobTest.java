@@ -40,8 +40,8 @@ public class JobTest {
         public void setUpAll() throws SQLException {
             connectionSource = new JdbcConnectionSource(URI);
             TableUtils.createTableIfNotExists(connectionSource, Employer.class);
-            employerDao = DaoManager.createDao(connectionSource, Employer.class);
             TableUtils.createTableIfNotExists(connectionSource, Job.class);
+            employerDao = DaoManager.createDao(connectionSource, Employer.class);
             jobDao = DaoManager.createDao(connectionSource, Job.class);
         }
 
@@ -81,6 +81,69 @@ public class JobTest {
             assertEquals(ls.size(), 1);
             assertEquals("", ls.get(0).getDomain());
         }
+
+        // insert multiple job records, and assert they were indeed added!
+        @Test
+        public void testCreateMultipleJobs() throws SQLException {
+            //create new employer and persist to database
+            Employer e = new Employer("First Solar", "Energy", "A leading global provider of comprehensive PV solar solutions!");
+            employerDao.create(e);
+            //create multiple new job instances
+            Date d = new Date();
+            List<Job> lsCreate = new ArrayList<>();
+            lsCreate.add(new Job("Supervising Manager", d, d, "something", "San Francisco", true, false, "Good looking", 36, e));
+            lsCreate.add(new Job("Engineer", d, d, "boop", "Ontario, Canada", true, true, "Big ideas", 25, e));
+            lsCreate.add(new Job("Designer", d, d, "blip", "Ontario, Canada", false, true, "cool :)", 21, e));
+            lsCreate.add(new Job("Fun Guy", d, d, "nob", "The Moon", false, false, "just a really fun guy", 9999, e));
+            // try to insert them into jobs table. This must succeed!
+            jobDao.create(lsCreate);
+            // read all jobs
+            List<Job> lsRead = jobDao.queryForAll();
+            // assert all jobs in lsCreate were inserted and can be read
+            for(int i = 0; i < 4; i++) {
+                assertEquals(lsCreate.get(i).getTitle(), lsRead.get(i).getTitle());
+            }
+        }
+
+        // inserting a new record where title is not unique must succeed!
+        @Test
+        public void testCreateDuplicateTitle() throws SQLException {
+            //create new employer and persist to database
+            Employer e = new Employer("GamerCorp", "Gaming", "We've got alpha gamers");
+            employerDao.create(e);
+            //create two associated jobs for the employer with the same title
+            Date d = new Date();
+            Job j1 = new Job("Gamer", d, d, "nom", "Gamers' Paradise", true, true, "must be an alpha gamer", 2, e);
+            Job j2 = new Job("Gamer", d, d, "om", "Gamers' Dungeon", false, false, "must be good at games", 3, e);
+            // try to insert them into jobs table. This must succeed!
+            jobDao.create(j1);
+            jobDao.create(j2);
+            List<Job> ls = jobDao.queryForEq("title", j1.getTitle());
+            assertEquals(ls.size(), 2);
+            assertEquals("Gamer", ls.get(0).getTitle());
+            assertEquals("Gamer", ls.get(1).getTitle());
+        }
+
+        // insert a new record, then delete it, and assert it was indeed removed!
+        @Test
+        public void testDeleteAllFieldsMatch() throws SQLException {
+            // create a new employer and persist to database
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create an associated job for the employer
+            Date d = new Date();
+            Job j = new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e);
+            //insert into jobs table
+            jobDao.create(j);
+            List<Job> ls1 = jobDao.queryForEq("title", j.getTitle());
+            assertEquals(1, ls1.size());
+            assertEquals("Ketchup taster", ls1.get(0).getTitle());
+            jobDao.delete(j);
+            // Assert "Kraft Heinz" was removed from employers
+            List<Job> ls2 = jobDao.queryForEq("title", j.getTitle());
+            assertEquals(0, ls2.size());
+        }
+
     }
 
 
