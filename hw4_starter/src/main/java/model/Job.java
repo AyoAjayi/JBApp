@@ -32,7 +32,7 @@ public class Job {
     private String requirements;
     @DatabaseField
     private int payAmount;
-    @DatabaseField(foreign = true, columnDefinition = "ON UPDATE CASCADE ON DELETE CASCADE")
+    @DatabaseField(foreign = true) //columnDefinition = "ON UPDATE CASCADE ON DELETE CASCADE")
     private Employer employer;
 
     public Job() {
