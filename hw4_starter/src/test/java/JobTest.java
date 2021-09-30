@@ -124,6 +124,62 @@ public class JobTest {
             assertEquals("Gamer", ls.get(1).getTitle());
         }
 
+        // insert a new job, update its location, then assert it was indeed updated!
+        @Test
+        public void testUpdateLocation() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create an associated job for the employer
+            Date d = new Date();
+            Job j = new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e);
+            j.setLocation("Some better alleyway");
+            jobDao.createOrUpdate(j);
+            // assert the sector is updated successfully!
+            assertEquals("Some better alleyway", jobDao.queryForEq("title", "Ketchup taster").get(0).getLocation());
+        }
+
+        // insert a new job, update its title, then assert it was indeed updated!
+        @Test
+        public void testUpdateTitle() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create an associated job for the employer
+            Date d = new Date();
+            Job j = new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e);
+            j.setTitle("Ketchup refiner");
+            jobDao.createOrUpdate(j);
+            // assert the sector is updated successfully!
+            assertEquals("Ketchup refiner", jobDao.queryForEq("location", "Some dark alleyway").get(0).getTitle());
+        }
+
+        // insert a new job, update its title, then assert it was indeed updated!
+        @Test
+        public void testUpdateDomain() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create an associated job for the employer
+            Date d = new Date();
+            Job j = new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e);
+            j.setDomain("everywhere");
+            jobDao.createOrUpdate(j);
+            // assert the sector is updated successfully!
+            assertEquals("everywhere", jobDao.queryForEq("location", "Some dark alleyway").get(0).getDomain());
+        }
+
+        //updating a job's id to an id value that exists in the table fails
+        @Test
+        public void testUpdateJobIDFail() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create associated jobs for the employer
+            Date d = new Date();
+            List<Job> myList = new ArrayList<>();
+            myList.add(new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e));
+            myList.add(new Job("Ketchup refiner", d, d, "there", "Some bright alleyway", false, true, "have good skills", 20, e));
+            jobDao.create(myList);
+            Assertions.assertThrows(SQLException.class, () ->  jobDao.updateId(myList.get(0),myList.get(1).getId()));
+        }
+
         // insert a new record, then delete it, and assert it was indeed removed!
         @Test
         public void testDeleteAllFieldsMatch() throws SQLException {
@@ -142,6 +198,58 @@ public class JobTest {
             // Assert "Kraft Heinz" was removed from employers
             List<Job> ls2 = jobDao.queryForEq("title", j.getTitle());
             assertEquals(0, ls2.size());
+        }
+
+        //  D(elete)
+        //  Deleting an employer record
+        //  (using the "delete" function of ORMLite) based on an id that does not exist does not delete any rows even if
+        //  a row with the same exact name exists
+        @Test
+        public void testDeleteEmployerRecordFails() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create associated jobs for the employer
+            Date d = new Date();
+            List<Job> myList = new ArrayList<>();
+            myList.add(new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e));
+            myList.add(new Job("Ketchup refiner", d, d, "there", "Some bright alleyway", false, true, "have good skills", 20, e));
+            jobDao.create(myList);
+            jobDao.updateId(myList.get(0),100);
+            jobDao.delete(jobDao.queryForId(10));
+            assertEquals(myList.size(),jobDao.queryForAll().size());
+
+            Assertions.assertDoesNotThrow(() ->  jobDao.delete(jobDao.queryForId(10)), "Test passed");
+        }
+
+        //Deleting an employer record (using the "delete" function of ORMLite) based on an id that exists succeeds even if the names are different
+        @Test
+        public void testDeleteJobRecordSucceeds() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create associated jobs for the employer
+            Date d = new Date();
+            List<Job> myList = new ArrayList<>();
+            myList.add(new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e));
+            myList.add(new Job("Ketchup refiner", d, d, "there", "Some bright alleyway", false, true, "have good skills", 20, e));
+            jobDao.create(myList);
+            jobDao.updateId(myList.get(0),10);
+            Assertions.assertDoesNotThrow(() ->  jobDao.delete(jobDao.queryForId(10)), "Test passed");
+        }
+
+        //Deleting a collection of employers at once (using the "delete" function of ORMLite) removes all those employers that exist from the table
+        @Test
+        public void testDeleteJobCollectionExists() throws SQLException {
+            Employer e = new Employer("Kraft Heinz", "Food", "A global food and beverage company!");
+            employerDao.create(e);
+            //create associated jobs for the employer
+            Date d = new Date();
+            List<Job> myList = new ArrayList<>();
+            myList.add(new Job("Ketchup taster", d, d, "here", "Some dark alleyway", true, true, "have good taste", 18, e));
+            myList.add(new Job("Ketchup refiner", d, d, "there", "Some bright alleyway", false, true, "have good skills", 20, e));
+            jobDao.create(myList);
+            jobDao.delete(myList);
+            List<Job> lsRead = jobDao.queryForAll();
+            assertEquals(0, lsRead.size());
         }
 
     }
